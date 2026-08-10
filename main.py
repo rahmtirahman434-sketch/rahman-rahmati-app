@@ -7,6 +7,6 @@ LabelBase.register(name="Vazir", fn_regular="Vazirmatn-Regular (1).ttf")
 
 class RahmanApp(App):
     def build(self):
-        return Label(text='رحمان رحمتی', font_size=32, font_name="Vazir")
+        return Label(text='پیام‌رسان رحمانی', font_size=32, font_name="Vazir")
 
 RahmanApp().run()
