@@ -4,6 +4,7 @@ package.name = rahmanrahmati
 package.domain = org.rahman
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,ttf
+icon.filename = %(source.dir)s/00000000d2d081f4b18b53df52baf767.png
 version = 1.0
 requirements = python3,kivy
 orientation = portrait
