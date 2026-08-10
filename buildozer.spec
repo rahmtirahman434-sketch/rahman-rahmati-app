@@ -1,22 +1,48 @@
-[app]
-title = پیام‌رسان رحمانی
-package.name = rahmanrahmati
-package.domain = org.rahman
-source.dir = .
-source.include_exts = py,png,jpg,kv,atlas,ttf
-icon.filename = %(source.dir)s/00000000d2d081f4b18b53df52baf767.png
-version = 1.0
-requirements = python3,kivy
-orientation = portrait
-fullscreen = 0
-
-[buildozer]
-log_level = 2
-warn_on_root = 1
-
-android.permissions = INTERNET
-android.api = 31
-android.minapi = 21
-android.ndk = 25b
-android.build_tools_version = 31.0.0
-android.accept_sdk_license = True
+name: Build APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          docker system prune -af || true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+      - name: Install buildozer
+        run: |
+          pip install "pip<24.1"
+          pip install --upgrade Cython buildozer
+      - name: Pre-download Android SDK
+        run: |
+          yes | buildozer android debug || true
+      - name: Accept all SDK licenses
+        run: |
+          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+      - name: Build APK
+        run: |
+          echo "pip<24.1" > /tmp/constraints.txt
+          PIP_CONSTRAINT=/tmp/constraints.txt buildozer -v android debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: bin/*.apk
