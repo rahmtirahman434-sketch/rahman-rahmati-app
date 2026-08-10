@@ -1,5 +1,5 @@
 [app]
-title = رحمان رحمتی
+title = پیام‌رسان رحمانی
 package.name = rahmanrahmati
 package.domain = org.rahman
 source.dir = .
