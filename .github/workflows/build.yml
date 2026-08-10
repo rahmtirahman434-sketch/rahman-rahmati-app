@@ -8,6 +8,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo rm -rf /usr/local/lib/android
+          docker system prune -af || true
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -24,14 +32,13 @@ jobs:
       - name: Install buildozer
         run: |
           pip install "pip<24.1"
-          pip install buildozer cython
+          pip install --upgrade Cython buildozer
       - name: Build APK
         run: |
           echo "pip<24.1" > /tmp/constraints.txt
-          export PIP_CONSTRAINT=/tmp/constraints.txt
-          yes | buildozer -v android debug
+          PIP_CONSTRAINT=/tmp/constraints.txt buildozer -v android debug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: rahman-rahmati-apk
+          name: apk
           path: bin/*.apk
