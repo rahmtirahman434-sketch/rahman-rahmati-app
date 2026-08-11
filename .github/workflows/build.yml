@@ -24,12 +24,12 @@ jobs:
       - name: Install Buildozer
         run: |
           pip install --upgrade pip
-          pip install buildozer==1.5.0 cython==0.29.33 python-for-android==2024.1.21
+          pip install buildozer==1.5.0 cython==0.29.33
 
-      - name: Patch python-for-android pip bug
+      - name: Prepare patched python-for-android
         run: |
-          P4A_BUILD_PY=$(python -c "import pythonforandroid, os; print(os.path.join(os.path.dirname(pythonforandroid.__file__), 'build.py'))")
-          sed -i "s/pip install -U pip/python -m pip install -U pip/" "$P4A_BUILD_PY"
+          git clone -b master --single-branch https://github.com/kivy/python-for-android.git /home/runner/p4a-src
+          sed -i "s/pip install -U pip/python -m pip install -U pip/" /home/runner/p4a-src/pythonforandroid/build.py
 
       - name: Build APK
         run: |
