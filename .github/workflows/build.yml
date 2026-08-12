@@ -19,21 +19,23 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo-dev cmake libffi-dev libssl-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo-dev cmake libffi-dev libssl-dev libltdl-dev
 
       - name: Install Buildozer
         run: |
           pip install --upgrade pip
-          pip install buildozer==1.5.0 cython==0.29.33
+          pip install buildozer cython
 
       - name: Prepare patched python-for-android
         run: |
-          git clone -b master --single-branch https://github.com/kivy/python-for-android.git /home/runner/p4a-src
-          sed -i "s/pip install -U pip/python -m pip install -U pip/" /home/runner/p4a-src/pythonforandroid/build.py
+          rm -rf /home/runner/p4a-src
+          git clone https://github.com/kivy/python-for-android /home/runner/p4a-src
+          grep -rl "python -m pip install -U pip" /home/runner/p4a-src | xargs -r sed -i 's/python -m pip install -U pip/true/g'
+          pip install -e /home/runner/p4a-src
 
       - name: Build APK
         run: |
-          buildozer -v android debug
+          yes | buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
